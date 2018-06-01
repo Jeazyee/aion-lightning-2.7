@@ -30,6 +30,8 @@ import com.aionlightning.commons.database.DatabaseFactory;
 import com.aionlightning.loginserver.dao.PremiumDAO;
 
 /**
+ * Modified by Jeazyee to work with WP only!
+ *
  * @author KID
  */
 public class MySQL5PremiumDAO extends PremiumDAO {
@@ -38,7 +40,7 @@ public class MySQL5PremiumDAO extends PremiumDAO {
 	@Override
 	public long getPoints(int accountId) {
 		long points = 0;
-		PreparedStatement st = DB.prepareStatement("SELECT toll FROM account_data WHERE id=?");
+		PreparedStatement st = DB.prepareStatement("SELECT toll FROM wp_users WHERE ID=?");
 		try {
 			st.setInt(1, accountId);
 			ResultSet rs = st.executeQuery();
@@ -101,7 +103,7 @@ public class MySQL5PremiumDAO extends PremiumDAO {
 		boolean s = true;
 		try {
 			con = DatabaseFactory.getConnection();
-			PreparedStatement stmt = con.prepareStatement("UPDATE account_data SET toll=? WHERE id=?");
+			PreparedStatement stmt = con.prepareStatement("UPDATE wp_users SET toll=? WHERE ID=?");
 			stmt.setLong(1, points - required);
 			stmt.setInt(2, accountId);
 			stmt.execute();

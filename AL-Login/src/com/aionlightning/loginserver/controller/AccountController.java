@@ -1,16 +1,16 @@
 /**
  * This file is part of aion-lightning <aion-lightning.org>.
- * 
+ *
  * aion-lightning is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * aion-lightning is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with aion-lightning.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,10 +38,11 @@ import com.aionlightning.loginserver.network.gameserver.GsConnection;
 import com.aionlightning.loginserver.network.gameserver.serverpackets.SM_ACCOUNT_AUTH_RESPONSE;
 import com.aionlightning.loginserver.network.gameserver.serverpackets.SM_GS_CHARACTER_RESPONSE;
 import com.aionlightning.loginserver.network.gameserver.serverpackets.SM_REQUEST_KICK_ACCOUNT;
-import com.aionlightning.loginserver.utils.AccountUtils;
+import com.aionlightning.loginserver.utils.phpass.PHPass;
 
 /**
  * This class is resposible for controlling all account actions
+ * has been modified by Jeazyee to work with WP Auth instead shitty old auth method
  * 
  * @author KID
  * @author SoulKeeper
@@ -188,8 +189,9 @@ public class AccountController {
 			return AionAuthResponse.GM_ONLY;
 		}
 
-		// check for paswords beeing equals
-		if (!account.getPasswordHash().equals(AccountUtils.encodePassword(password)))
+		// check for paswords beeing equal
+		PHPass pa = new PHPass(8);
+		if (!pa.CheckPassword(password,account.getPasswordHash()))
 		{
 			return AionAuthResponse.INVALID_PASSWORD;
 		}
@@ -284,7 +286,7 @@ public class AccountController {
 	 * 
 	 * @param accountId
 	 *          id of account
-	 * @param adress
+	 * @param address
 	 *          new macAdress
 	 * @return refreshed or not
 	 */
@@ -326,7 +328,8 @@ public class AccountController {
 	 */
 	public static Account createAccount(String name, String password)
 	{
-		String passwordHash = AccountUtils.encodePassword(password);
+		PHPass pa = new PHPass(8);
+		String passwordHash = pa.HashPassword(password);
 		Account account = new Account();
 
 		account.setName(name);

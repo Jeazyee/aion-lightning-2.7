@@ -30,6 +30,7 @@ import com.aionlightning.loginserver.model.Account;
 
 /**
  * MySQL5 Account DAO implementation
+ * Modified by Jeazyee to work with WP only!
  * 
  * @author SoulKeeper, xTz
  */
@@ -46,7 +47,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	@Override
 	public Account getAccount(String name) {
 		Account account = null;
-		PreparedStatement st = DB.prepareStatement("SELECT * FROM account_data WHERE `name` = ?");
+		PreparedStatement st = DB.prepareStatement("SELECT * FROM wp_users WHERE `user_login` = ?");
 
 		try {
 			st.setString(1, name);
@@ -56,9 +57,9 @@ public class MySQL5AccountDAO extends AccountDAO {
 			if (rs.next()) {
 				account = new Account();
 
-				account.setId(rs.getInt("id"));
+				account.setId(rs.getInt("ID"));
 				account.setName(name);
-				account.setPasswordHash(rs.getString("password"));
+				account.setPasswordHash(rs.getString("user_pass"));
 				account.setAccessLevel(rs.getByte("access_level"));
 				account.setMembership(rs.getByte("membership"));
 				account.setActivated(rs.getByte("activated"));
@@ -82,7 +83,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	@Override
 	public Account getAccount(int id) {
 		Account account = null;
-		PreparedStatement st = DB.prepareStatement("SELECT * FROM account_data WHERE `id` = ?");
+		PreparedStatement st = DB.prepareStatement("SELECT * FROM wp_users WHERE `ID` = ?");
 
 		try {
 			st.setInt(1, id);
@@ -92,9 +93,9 @@ public class MySQL5AccountDAO extends AccountDAO {
 			if (rs.next()) {
 				account = new Account();
 
-				account.setId(rs.getInt("id"));
-				account.setName(rs.getString("name"));
-				account.setPasswordHash(rs.getString("password"));
+				account.setId(id);
+				account.setName(rs.getString("user_login"));
+				account.setPasswordHash(rs.getString("user_pass"));
 				account.setAccessLevel(rs.getByte("access_level"));
 				account.setMembership(rs.getByte("membership"));
 				account.setActivated(rs.getByte("activated"));
@@ -121,7 +122,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	@Override
 	public int getAccountId(String name) {
 		int id = -1;
-		PreparedStatement st = DB.prepareStatement("SELECT `id` FROM account_data WHERE `name` = ?");
+		PreparedStatement st = DB.prepareStatement("SELECT `ID` FROM wp_users WHERE `user_login` = ?");
 
 		try {
 			st.setString(1, name);
@@ -130,7 +131,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 
 			rs.next();
 
-			id = rs.getInt("id");
+			id = rs.getInt("ID");
 		}
 		catch (SQLException e) {
 			log.error("Can't select id after account insertion", e);
@@ -147,7 +148,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	 */
 	@Override
 	public int getAccountCount() {
-		PreparedStatement st = DB.prepareStatement("SELECT count(*) AS c FROM account_data");
+		PreparedStatement st = DB.prepareStatement("SELECT count(*) AS c FROM wp_users");
 		ResultSet rs = DB.executeQuerry(st);
 
 		try {
@@ -173,7 +174,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	{
 		int result = 0;
 		PreparedStatement st = DB
-			.prepareStatement("INSERT INTO account_data(`name`, `password`, access_level, membership, activated, last_server, last_ip, last_mac, ip_force, toll, age_limit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			.prepareStatement("INSERT INTO wp_users(`user_login`, `user_pass`, access_level, membership, activated, last_server, last_ip, last_mac, ip_force, toll, age_limit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 		try
 		{
@@ -214,7 +215,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	public boolean updateAccount(Account account)
 	{
 		int result = 0;
-		PreparedStatement st = DB.prepareStatement("UPDATE account_data SET `name` = ?, `password` = ?, access_level = ?, membership = ?, last_server = ?, last_ip = ?, last_mac = ?, ip_force = ? WHERE `id` = ?");
+		PreparedStatement st = DB.prepareStatement("UPDATE wp_users SET `user_login` = ?, `user_pass` = ?, access_level = ?, membership = ?, last_server = ?, last_ip = ?, last_mac = ?, ip_force = ? WHERE `id` = ?");
 
 		try {
 			st.setString(1, account.getName());
@@ -243,7 +244,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	 */
 	@Override
 	public boolean updateLastServer(final int accountId, final byte lastServer) {
-		return DB.insertUpdate("UPDATE account_data SET last_server = ? WHERE id = ?", new IUStH() {
+		return DB.insertUpdate("UPDATE wp_users SET last_server = ? WHERE id = ?", new IUStH() {
 
 			@Override
 			public void handleInsertUpdate(PreparedStatement preparedStatement) throws SQLException {
@@ -259,7 +260,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	 */
 	@Override
 	public boolean updateLastIp(final int accountId, final String ip) {
-		return DB.insertUpdate("UPDATE account_data SET last_ip = ? WHERE id = ?", new IUStH() {
+		return DB.insertUpdate("UPDATE wp_users SET last_ip = ? WHERE ID = ?", new IUStH() {
 
 			@Override
 			public void handleInsertUpdate(PreparedStatement preparedStatement) throws SQLException {
@@ -276,7 +277,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	@Override
 	public String getLastIp(final int accountId) {
 		String lastIp = "";
-		PreparedStatement st = DB.prepareStatement("SELECT `last_ip` FROM `account_data` WHERE `id` = ?");
+		PreparedStatement st = DB.prepareStatement("SELECT `last_ip` FROM `wp_users` WHERE `ID` = ?");
 
 		try {
 			st.setInt(1, accountId);
@@ -301,7 +302,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	 */
 	@Override
 	public boolean updateLastMac(final int accountId, final String mac) {
-		return DB.insertUpdate("UPDATE `account_data` SET `last_mac` = ? WHERE `id` = ?", new IUStH() {
+		return DB.insertUpdate("UPDATE `wp_users` SET `last_mac` = ? WHERE `ID` = ?", new IUStH() {
 
 			@Override
 			public void handleInsertUpdate(PreparedStatement preparedStatement) throws SQLException {
@@ -318,7 +319,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	@Override
 	public boolean updateMembership(final int accountId) {
 		return DB.insertUpdate(
-			"UPDATE account_data SET membership = old_membership, expire = NULL WHERE id = ? and expire < CURRENT_TIMESTAMP",
+			"UPDATE wp_users SET membership = old_membership, expire = NULL WHERE ID = ? and expire < CURRENT_TIMESTAMP",
 			new IUStH() {
 
 				@Override
@@ -334,7 +335,7 @@ public class MySQL5AccountDAO extends AccountDAO {
 	 */
 	@Override
 	public void deleteInactiveAccounts(int daysOfInactivity) {
-		PreparedStatement statement = DB.prepareStatement("DELETE FROM account_data WHERE id IN (SELECT account_id FROM account_time WHERE UNIX_TIMESTAMP(CURDATE())-UNIX_TIMESTAMP(last_active) > ? * 24 * 60 * 60)");
+		PreparedStatement statement = DB.prepareStatement("DELETE FROM wp_users WHERE ID IN (SELECT account_id FROM account_time WHERE UNIX_TIMESTAMP(CURDATE())-UNIX_TIMESTAMP(last_active) > ? * 24 * 60 * 60)");
 		try {
 			statement.setInt(1, daysOfInactivity);
 		}

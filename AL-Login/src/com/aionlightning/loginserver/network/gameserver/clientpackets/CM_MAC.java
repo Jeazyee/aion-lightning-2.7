@@ -40,6 +40,6 @@ public class CM_MAC extends GsClientPacket {
 	@Override
 	protected void runImpl() {
 		if(!AccountController.refreshAccountsLastMac(accountId, address))
-				LoggerFactory.getLogger(CM_MAC.class).error("[WARN] We just weren't able to update account_data.last_mac for accountId "+accountId);
+				LoggerFactory.getLogger(CM_MAC.class).error("[WARN] We just weren't able to update wp_users.last_mac for accountId "+accountId);
 	}
 }
