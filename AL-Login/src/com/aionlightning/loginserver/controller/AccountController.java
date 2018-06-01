@@ -189,9 +189,8 @@ public class AccountController {
 			return AionAuthResponse.GM_ONLY;
 		}
 
-		// check for paswords beeing equal
-		PHPass pa = new PHPass(8);
-		if (!pa.CheckPassword(password,account.getPasswordHash()))
+		// check if inserted pw is matching regarding to the hash
+        if (!new PHPass(8).CheckPassword(password, account.getPasswordHash()))
 		{
 			return AionAuthResponse.INVALID_PASSWORD;
 		}
@@ -326,10 +325,9 @@ public class AccountController {
 	 *          account password
 	 * @return account object or null
 	 */
-	public static Account createAccount(String name, String password)
+	private static Account createAccount(String name, String password)
 	{
-		PHPass pa = new PHPass(8);
-		String passwordHash = pa.HashPassword(password);
+		String passwordHash = new PHPass(8).HashPassword(password);
 		Account account = new Account();
 
 		account.setName(name);
@@ -368,8 +366,8 @@ public class AccountController {
 	 * @param accountId
 	 */
 	public static synchronized void loadGSCharactersCount(int accountId) {
-		GsConnection gsc = null;
-		Map<Integer, Integer> accountCharacterCount = null;
+		GsConnection gsc;
+		Map<Integer, Integer> accountCharacterCount;
 
 		if (accountsGSCharacterCounts.containsKey(accountId))
 			accountsGSCharacterCounts.remove(accountId);
@@ -399,8 +397,7 @@ public class AccountController {
 		Map<Integer, Integer> characterCount = accountsGSCharacterCounts.get(accountId);
 
 		if (characterCount != null) {
-			if (characterCount.size() == GameServerTable.getGameServers().size())
-				return true;
+			return characterCount.size() == GameServerTable.getGameServers().size();
 		}
 
 		return false;
